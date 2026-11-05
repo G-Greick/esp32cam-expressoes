@@ -1,0 +1,15 @@
+# Senha do Wi-Fi e endereco do PC
+firmware/esp32cam_expressoes/segredos.h
+
+# Ambiente Python
+pc/.venv/
+__pycache__/
+*.pyc
+
+# Baixados automaticamente no primeiro uso
+pc/modelos/
+
+# Dados locais: fotos e base de teste
+pc/capturas/
+pc/dados/
+pc/ultimo_ip.txt
