@@ -75,6 +75,18 @@ class DetectorRostos:
         return caixas
 
 
+def escolher_expressao(logits: np.ndarray, rotulos: list[str]) -> tuple[str, float]:
+    """Devolve a expressão mais provável entre as 7 classes do projeto (as do FER-2013).
+
+    Os modelos também têm a classe "desprezo", que fica de fora.
+    """
+    prob = np.exp(logits - logits.max())
+    prob[rotulos.index("desprezo")] = 0
+    prob /= prob.sum()
+    i = int(prob.argmax())
+    return rotulos[i], float(prob[i])
+
+
 class Classificador:
     """Classificador de expressões. Para usar outro modelo, troque esta classe:
     basta que `classificar(rosto_bgr)` retorne (rótulo, confiança)."""
@@ -89,10 +101,7 @@ class Classificador:
         cinza = cv2.cvtColor(rosto_bgr, cv2.COLOR_BGR2GRAY)
         x = cv2.resize(cinza, (64, 64)).astype(np.float32)[np.newaxis, np.newaxis]
         logits = self.sessao.run(None, {self.entrada: x})[0][0]
-        prob = np.exp(logits - logits.max())
-        prob /= prob.sum()
-        i = int(prob.argmax())
-        return EXPRESSOES[i], float(prob[i])
+        return escolher_expressao(logits, EXPRESSOES)
 
 
 class ClassificadorHSEmotion:
@@ -110,10 +119,7 @@ class ClassificadorHSEmotion:
         rgb = cv2.cvtColor(cv2.resize(rosto_bgr, (224, 224)), cv2.COLOR_BGR2RGB).astype(np.float32) / 255
         x = ((rgb - self.MEDIA) / self.DESVIO).transpose(2, 0, 1)[np.newaxis]
         logits = self.sessao.run(None, {self.entrada: x})[0][0]
-        prob = np.exp(logits - logits.max())
-        prob /= prob.sum()
-        i = int(prob.argmax())
-        return EXPRESSOES_HSEMOTION[i], float(prob[i])
+        return escolher_expressao(logits, EXPRESSOES_HSEMOTION)
 
 
 def carregar_modelos(escolha: str) -> list[tuple[str, object, tuple[int, int, int]]]:

@@ -1,6 +1,12 @@
 # Senha do Wi-Fi e endereco do PC
 firmware/esp32cam_expressoes/segredos.h
 
+# Senha da pagina
+pc/senha_web.txt
+
+# Baixado automaticamente ao publicar
+pc/ferramentas/
+
 # Ambiente Python
 pc/.venv/
 __pycache__/
